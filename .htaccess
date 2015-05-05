@@ -1,0 +1,7 @@
+Options -Indexes
+
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^ponto-api-mrprompt.c9.io$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^ponto-api-mrprompt.c9.io$
+RewriteCond %{REQUEST_URI} !public/
+RewriteRule (.*) /public/$1 [L]
