@@ -39,14 +39,16 @@ if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
 
 try {
     // campos do form
-    $arrUsuarios = (array) explode(',', $_POST['usuarios']);
-
-    $objUsuarios = new \Usuarios();
+    $arrUsuarios = (array) explode('|', $_POST['usuarios']);
 
     foreach ($arrUsuarios as $usuarioId) {
-        $objUsuarios->setOwner($_POST['usuario'])
-                    ->setId($usuarioId)
-                    ->delete();
+        $objUsuario = new \Usuarios();
+        $objUsuario
+            ->setOwner($_POST['usuario'])
+            ->setId($usuarioId)
+            ->delete();
+
+        unset($objUsuario);
     }
 
     $retorno = true;

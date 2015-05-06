@@ -233,7 +233,10 @@ class Usuarios extends \AbstractDb
 
             if (!empty($arrUsuario['id'])) {
                 $arrUsuario['id']    = $this->_encrypt($arrUsuario['id']);
-                $arrUsuario['owner'] = $this->_encrypt($arrUsuario['owner']);
+
+                if ($arrUsuario['owner']) {
+                    $arrUsuario['owner'] = $this->_encrypt($arrUsuario['owner']);
+                }
 
                 return $arrUsuario;
             } else {

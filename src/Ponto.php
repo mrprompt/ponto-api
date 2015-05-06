@@ -53,36 +53,10 @@ class PontoException extends \AbstractDbException
  */
 class Ponto extends \Usuarios
 {
-    //private $_id;
-    //private $_usuario_id;
     private $_entrada;
     private $_saida;
     private $_obs;
-    /*
-    public function getId()
-    {
-        return $this->_id;
-    }
 
-    public function setId($_id)
-    {
-        $this->_id = $_id;
-
-        return $this;
-    }
-
-    public function getUsuarioId()
-    {
-        return $this->_usuario_id;
-    }
-
-    public function setUsuarioId($_usuario_id)
-    {
-        $this->_usuario_id = $_usuario_id;
-
-        return $this;
-    }
-    */
     public function getEntrada()
     {
         return $this->_entrada;
