@@ -180,12 +180,12 @@ class Ponto extends \Usuarios
 
             if (empty($retorno['id'])) {
                 $sql = "INSERT INTO ponto(id, entrada, saida, obs, usuario_id) "
-                     . "VALUES(NULL, DATETIME('NOW', 'LOCALTIME'), NULL, "
-                     . ":obs, :usuario_id)";
+                     . "VALUES(NULL, :entrada, NULL, :obs, :usuario_id)";
 
                 $stmt = $this->getInstance()->prepare($sql);
                 $stmt->bindValue(':obs', $this->getObs());
                 $stmt->bindValue(':usuario_id', $uid);
+                $stmt->bindValue(':entrada', (new DateTime())->format('Y-m-d H:i:s'));
 
                 if ($stmt->execute() == true) {
                     return $this->getInstance()->lastInsertRowID();
@@ -209,7 +209,7 @@ class Ponto extends \Usuarios
     public function saida()
     {
         $sql = "UPDATE ponto "
-             . "SET saida = DATETIME('NOW', 'LOCALTIME'), obs = :obs "
+             . "SET saida = :saida, obs = :obs "
              . "WHERE entrada BETWEEN "
              . "STRFTIME('%Y-%m-%d 00:00:00', DATE('NOW', 'LOCALTIME')) "
              . "AND DATETIME('NOW', 'LOCALTIME') "
@@ -224,6 +224,7 @@ class Ponto extends \Usuarios
         $stmt = $this->getInstance()->prepare($sql);
         $stmt->bindValue(':obs', $this->getObs());
         $stmt->bindValue(':usuario_id', $this->_decrypt($this->getId()));
+        $stmt->bindValue(':saida', (new DateTime())->format('Y-m-d H:i:s'));
 
         if ($stmt->execute() == true) {
             return $this->getInstance()->changes();
