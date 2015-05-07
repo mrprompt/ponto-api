@@ -40,37 +40,10 @@ if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
 try {
     $objPonto = new \Ponto();
     $objPonto->setId($_POST['usuario'])
-             ->setObs($_POST['observacao']);
+             ->setObs($_POST['observacao'])
+             ->saida();
 
-    switch ($_POST['tipo']) {
-        case 'entrada':
-            try {
-                if ($objPonto->entrada() > 0) {
-                    $retorno = 'Entrada registrada com sucesso!';
-                } else {
-                    $retorno = 'Erro registrando entrada.';
-                }
-            } catch (Exception $e) {
-                $retorno = $e->getMessage();
-            }
-            break;
-
-        case 'saida':
-            try {
-                if ($objPonto->saida() > 0) {
-                    $retorno = 'Saída registrada com sucesso!';
-                } else {
-                    $retorno = 'Erro registrando saída. Verifique se você já '
-                             . 'registrou sua entrada.';
-                }
-            } catch (Exception $e) {
-                $retorno = $e->getMessage();
-            }
-            break;
-
-        default:
-            $retorno = 'Parâmetro inválido';
-    }
+    $retorno = 'Ponto registrado com sucesso!';
 } catch (Exception $e) {
     $retorno = $e->getMessage();
 }

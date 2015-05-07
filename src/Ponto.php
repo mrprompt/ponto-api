@@ -157,47 +157,23 @@ class Ponto extends \Usuarios
     public function entrada()
     {
         // decriptografo o id do usuário
-        $uid = $this->_decrypt($this->getId());
+        $uid        = $this->_decrypt($this->getId());
+        $db         = $this->getInstance();
+        $now        = new DateTime();
+        $entrada    = $now->format('Y-m-d H:i:s');
+        $sql        = "INSERT INTO ponto(id, entrada, saida, obs, usuario_id) "
+                    . "VALUES(NULL, :entrada, NULL, :obs, :usuario_id)";
 
-        // primeiro busco se existe uma entrada sem registro de saída
-        $sql = "SELECT id "
-             . "FROM ponto "
-             . "WHERE entrada "
-             . "BETWEEN STRFTIME('%Y-%m-%d 00:00:00', DATE('NOW', 'LOCALTIME')) "
-             . "AND DATETIME('NOW', 'LOCALTIME') "
-             . "AND saida IS NULL "
-             . "AND usuario_id = :usuario_id "
-             . "ORDER BY entrada DESC "
-             . "LIMIT 1";
-
-        $stmt = $this->getInstance()->prepare($sql);
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':obs', $this->getObs());
         $stmt->bindValue(':usuario_id', $uid);
+        $stmt->bindValue(':entrada', $entrada);
 
-        $result = $stmt->execute();
-
-        if ($result == true) {
-            $retorno = $result->fetchArray(SQLITE3_ASSOC);
-
-            if (empty($retorno['id'])) {
-                $sql = "INSERT INTO ponto(id, entrada, saida, obs, usuario_id) "
-                     . "VALUES(NULL, :entrada, NULL, :obs, :usuario_id)";
-
-                $stmt = $this->getInstance()->prepare($sql);
-                $stmt->bindValue(':obs', $this->getObs());
-                $stmt->bindValue(':usuario_id', $uid);
-                $stmt->bindValue(':entrada', (new DateTime())->format('Y-m-d H:i:s'));
-
-                if ($stmt->execute() == true) {
-                    return $this->getInstance()->lastInsertRowID();
-                } else {
-                    throw new \PontoException('Erro registrando ponto.');
-                }
-            } else {
-                throw new \PontoException('Registro de saída não encontrado.');
-            }
-        } else {
-            throw new \PontoException('Erro buscando ponto.');
+        if ($stmt->execute() === false) {
+            throw new PontoException('Erro registrando ponto.');
         }
+
+        return $db->lastInsertRowID();
     }
 
     /**
@@ -208,50 +184,38 @@ class Ponto extends \Usuarios
      */
     public function saida()
     {
-        $sql = "UPDATE ponto "
-             . "SET saida = :saida, obs = :obs "
-             . "WHERE entrada BETWEEN "
-             . "STRFTIME('%Y-%m-%d 00:00:00', DATE('NOW', 'LOCALTIME')) "
-             . "AND DATETIME('NOW', 'LOCALTIME') "
-             . "AND usuario_id = :usuario_id "
-             . "AND id = (SELECT id FROM ponto WHERE entrada BETWEEN "
-             . "STRFTIME('%Y-%m-%d 00:00:00', DATE('NOW', 'LOCALTIME')) "
-             . "AND DATETIME('NOW', 'LOCALTIME') "
-             . "AND saida IS NULL "
-             . "AND usuario_id = :usuario_id "
-             . "ORDER BY entrada DESC LIMIT 1)";
+        $db         = $this->getInstance();
+        $now        = new DateTime();
+        $saida      = $now->format('Y-m-d H:i:s');
+        $entrada    = sprintf('%s 00:00:00', $now->format('Y-m-d'));
+        $sql        = "
+        UPDATE ponto
+        SET
+            saida           = :saida,
+            obs             = :obs
+        WHERE usuario_id    = :usuario_id
+        AND id = (
+            SELECT id
+            FROM ponto
+            WHERE entrada BETWEEN :entrada AND :saida
+            AND saida IS NULL
+            AND usuario_id = :usuario_id
+            ORDER BY entrada DESC
+            LIMIT 1
+        )";
 
-        $stmt = $this->getInstance()->prepare($sql);
+        $stmt = $db->prepare($sql);
         $stmt->bindValue(':obs', $this->getObs());
         $stmt->bindValue(':usuario_id', $this->_decrypt($this->getId()));
-        $stmt->bindValue(':saida', (new DateTime())->format('Y-m-d H:i:s'));
+        $stmt->bindValue(':saida', $saida);
+        $stmt->bindValue(':entrada', $entrada);
 
-        if ($stmt->execute() == true) {
-            return $this->getInstance()->changes();
-        } else {
-            throw new \PontoException('Erro registrando ponto.');
+        $result = $stmt->execute();
+
+        if ($result === false || $db->changes() == 0) {
+            $result = $this->entrada();
         }
-    }
 
-    /**
-     * Removo um registro
-     *
-     * @throws \PontoException
-     * @return boolean
-     */
-    public function delete()
-    {
-        $sql = "DELETE FROM ponto WHERE usuario_id = :id";
-
-        $prep = $this->getInstance()->prepare($sql);
-        $prep->bindValue(':id', $this->_decrypt($this->getId()));
-
-        $exec = $prep->execute();
-
-        if ($exec == true) {
-            return true;
-        } else {
-            throw new \PontoException('Erro removendo registro.');
-        }
+        return $result;
     }
 }
