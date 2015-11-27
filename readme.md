@@ -1,14 +1,7 @@
-Ponto
-=====
+Ponto - API
+===========
 
-Ponto é uma aplicação simples para contabilizar as horas trabalhadas.
-Este projeto foi concebido para atender minhas necessidades pessoais,
-além de ter como segundo objetivo, brincar com elementos dinâmicamente
-gerados pelo jQuery + jQuery UI.
-
-A base do projeto é HTML5, Session Storage, Javascript, Google Charts API,
-SQLite3 e PHP 5.3. Com isso, deu de brincar bastante.
-
+API utilizada na aplicação de [ponto eletrônico](https://github.com/mrprompt/ponto).
 
 Características
 ---------------
@@ -26,9 +19,6 @@ Requerimentos
 
 - PHP 5.3.x com módulos: Mcrypt, Filter, SQLite3
 - SQLite3
-- Conexão a internet (para gerar os gráficos)
-- Navegador compatível com HTML5, principalmente Session Storage 
-  (somente Google Chrome até o momento)
 
 Instalação
 ----------
