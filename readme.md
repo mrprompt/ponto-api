@@ -1,7 +1,7 @@
 Ponto - API
 ===========
 
-API utilizada na aplicação de [ponto eletrônico](https://github.com/mrprompt/ponto).
+API utilizada na aplicação de [ponto eletrônico](https://github.com/mrprompt/ponto-cliente).
 
 Características
 ---------------
