@@ -3,8 +3,6 @@ Ponto - API
 
 API utilizada na aplicação de [ponto eletrônico](https://github.com/mrprompt/ponto-cliente).
 
-Você pode utilizar uma versão "live" - cuidado, não utilize como seu ponto principal, esta é uma versão de demonstração - antes de instalar no próprio servidor em [https://github.com/mrprompt/ponto-cliente](https://github.com/mrprompt/ponto-cliente).
-
 Características
 ---------------
 
